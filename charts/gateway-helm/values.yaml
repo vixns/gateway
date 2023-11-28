@@ -1,0 +1,55 @@
+deployment:
+  envoyGateway:
+    cert:
+      expiryDays: 365
+    image:
+      repository: docker.io/envoyproxy/gateway-dev
+      tag: 'latest'
+    imagePullPolicy: Always
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  ports:
+    - name: grpc
+      port: 18000
+      targetPort: 18000
+    - name: ratelimit
+      port: 18001
+      targetPort: 18001
+  replicas: 1
+  pod:
+    annotations: {}
+    labels: {}
+
+config:
+  envoyGateway:
+    gateway:
+      controllerName: gateway.envoyproxy.io/gatewayclass-controller
+    provider:
+      type: Kubernetes
+    logging:
+      level:
+        default: info
+
+envoyGatewayMetricsService:
+  ports:
+    - name: http
+      port: 19001
+      protocol: TCP
+      targetPort: 19001
+
+createNamespace: false
+
+kubernetesClusterDomain: cluster.local
+
+certgen:
+  job:
+    annotations: {}
+    ttlSecondsAfterFinished: 10
+  rbac:
+    annotations: {}
+    labels: {}
