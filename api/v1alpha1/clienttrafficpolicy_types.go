@@ -34,6 +34,7 @@ type ClientTrafficPolicy struct {
 	Status ClientTrafficPolicyStatus `json:"status,omitempty"`
 }
 
+// +kubebuilder:validation:XValidation:rule="has(self.http3) && has(self.tls) && has(self.tls.alpnProtocols) ? self.tls.alpnProtocols.size() == 0 : true",message="alpn protocols can't be set if HTTP/3 is enabled"
 // ClientTrafficPolicySpec defines the desired state of ClientTrafficPolicy.
 type ClientTrafficPolicySpec struct {
 	// +kubebuilder:validation:XValidation:rule="self.group == 'gateway.networking.k8s.io'", message="this policy can only have a targetRef.group of gateway.networking.k8s.io"
@@ -52,6 +53,12 @@ type ClientTrafficPolicySpec struct {
 	//
 	// +optional
 	TCPKeepalive *TCPKeepalive `json:"tcpKeepalive,omitempty"`
+	// SuppressEnvoyHeaders configures the Envoy Router filter to suppress the "x-envoy-'
+	// headers from both requests and responses.
+	// By default these headers are added to both requests and responses.
+	//
+	// +optional
+	SuppressEnvoyHeaders *bool `json:"suppressEnvoyHeaders,omitempty"`
 	// EnableProxyProtocol interprets the ProxyProtocol header and adds the
 	// Client Address into the X-Forwarded-For header.
 	// Note Proxy Protocol must be present when this field is set, else the connection
@@ -59,6 +66,60 @@ type ClientTrafficPolicySpec struct {
 	//
 	// +optional
 	EnableProxyProtocol *bool `json:"enableProxyProtocol,omitempty"`
+	// ClientIPDetectionSettings provides configuration for determining the original client IP address for requests.
+	//
+	// +optional
+	ClientIPDetection *ClientIPDetectionSettings `json:"clientIPDetection,omitempty"`
+	// HTTP3 provides HTTP/3 configuration on the listener.
+	//
+	// +optional
+	HTTP3 *HTTP3Settings `json:"http3,omitempty"`
+	// TLS settings configure TLS termination settings with the downstream client.
+	//
+	// +optional
+	TLS *TLSSettings `json:"tls,omitempty"`
+	// Path enables managing how the incoming path set by clients can be normalized.
+	//
+	// +optional
+	Path *PathSettings `json:"path,omitempty"`
+	// HTTP1 provides HTTP/1 configuration on the listener.
+	//
+	// +optional
+	HTTP1 *HTTP1Settings `json:"http1,omitempty"`
+}
+
+// ClientIPDetectionSettings provides configuration for determining the original client IP address for requests.
+type ClientIPDetectionSettings struct {
+	// XForwardedForSettings provides configuration for using X-Forwarded-For headers for determining the client IP address.
+	//
+	// +optional
+	XForwardedFor *XForwardedForSettings `json:"xForwardedFor,omitempty"`
+}
+
+// XForwardedForSettings provides configuration for using X-Forwarded-For headers for determining the client IP address.
+type XForwardedForSettings struct {
+	// NumTrustedHops controls the number of additional ingress proxy hops from the right side of XFF HTTP
+	// headers to trust when determining the origin client's IP address.
+	// Refer to https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/headers#x-forwarded-for
+	// for more details.
+	//
+	// +optional
+	NumTrustedHops *uint32 `json:"numTrustedHops,omitempty"`
+}
+
+// HTTP3Settings provides HTTP/3 configuration on the listener.
+type HTTP3Settings struct {
+}
+
+// HTTP1Settings provides HTTP/1 configuration on the listener.
+type HTTP1Settings struct {
+	// EnableTrailers defines if HTTP/1 trailers should be proxied by Envoy.
+	// +optional
+	EnableTrailers *bool `json:"enableTrailers,omitempty"`
+	// PreserveHeaderCase defines if Envoy should preserve the letter case of headers.
+	// By default, Envoy will lowercase all the headers.
+	// +optional
+	PreserveHeaderCase *bool `json:"preserveHeaderCase,omitempty"`
 }
 
 // ClientTrafficPolicyStatus defines the state of ClientTrafficPolicy

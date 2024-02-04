@@ -41,7 +41,6 @@ func New(cfg *rest.Config, svr *config.Server, resources *message.ProviderResour
 		LeaderElectionID:       "5b9825d2.gateway.envoyproxy.io",
 	}
 
-	// TODO: implement config validation on the watch mode config
 	if svr.EnvoyGateway.NamespaceMode() {
 		mgrOpts.Cache.DefaultNamespaces = make(map[string]cache.Config)
 		for _, watchNS := range svr.EnvoyGateway.Provider.Kubernetes.Watch.Namespaces {
@@ -56,7 +55,7 @@ func New(cfg *rest.Config, svr *config.Server, resources *message.ProviderResour
 
 	updateHandler := status.NewUpdateHandler(mgr.GetLogger(), mgr.GetClient())
 	if err := mgr.Add(updateHandler); err != nil {
-		return nil, fmt.Errorf("failed to add status update handler %v", err)
+		return nil, fmt.Errorf("failed to add status update handler %w", err)
 	}
 
 	// Create and register the controllers with the manager.

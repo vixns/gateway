@@ -88,7 +88,14 @@ func TestTranslateXds(t *testing.T) {
 			name: "http-route-weighted-invalid-backend",
 		},
 		{
+			name: "http-route-dns-cluster",
+		},
+		{
 			name:           "simple-tls",
+			requireSecrets: true,
+		},
+		{
+			name:           "http3",
 			requireSecrets: true,
 		},
 		{
@@ -160,6 +167,7 @@ func TestTranslateXds(t *testing.T) {
 		{
 			name:                      "jsonpatch",
 			requireEnvoyPatchPolicies: true,
+			requireSecrets:            true,
 		},
 		{
 			name:                      "jsonpatch-missing-resource",
@@ -207,6 +215,39 @@ func TestTranslateXds(t *testing.T) {
 		},
 		{
 			name: "basic-auth",
+		},
+		{
+			name: "health-check",
+		},
+		{
+			name: "local-ratelimit",
+		},
+		{
+			name: "circuit-breaker",
+		},
+		{
+			name: "suppress-envoy-headers",
+		},
+		{
+			name: "fault-injection",
+		},
+		{
+			name: "tls-with-ciphers-versions-alpn",
+		},
+		{
+			name: "path-settings",
+		},
+		{
+			name: "client-ip-detection",
+		},
+		{
+			name: "http1-trailers",
+		},
+		{
+			name: "http1-preserve-case",
+		},
+		{
+			name: "timeout",
 		},
 	}
 
@@ -337,6 +378,9 @@ func TestTranslateRateLimitConfig(t *testing.T) {
 			name: "distinct-match",
 		},
 		{
+			name: "distinct-remote-address-match",
+		},
+		{
 			name: "value-match",
 		},
 		{
@@ -350,6 +394,9 @@ func TestTranslateRateLimitConfig(t *testing.T) {
 		},
 		{
 			name: "masked-remote-address-match",
+		},
+		{
+			name: "multiple-masked-remote-address-match-with-same-cidr",
 		},
 	}
 

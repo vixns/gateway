@@ -24,6 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -36,7 +37,6 @@ import (
 	"github.com/envoyproxy/gateway/internal/gatewayapi"
 	"github.com/envoyproxy/gateway/internal/message"
 	"github.com/envoyproxy/gateway/internal/provider/kubernetes/test"
-	"github.com/envoyproxy/gateway/internal/utils/ptr"
 )
 
 const (
@@ -1285,7 +1285,7 @@ func TestNamespacedProvider(t *testing.T) {
 	}()
 }
 
-func TestNamespaceSelectorsProvider(t *testing.T) {
+func TestNamespaceSelectorProvider(t *testing.T) {
 	// Setup the test environment.
 	testEnv, cliCfg, err := startEnv()
 	require.NoError(t, err)
@@ -1296,8 +1296,8 @@ func TestNamespaceSelectorsProvider(t *testing.T) {
 	// config to watch a subset of namespaces
 	svr.EnvoyGateway.Provider.Kubernetes = &egv1a1.EnvoyGatewayKubernetesProvider{
 		Watch: &egv1a1.KubernetesWatchMode{
-			Type:               egv1a1.KubernetesWatchModeTypeNamespaceSelectors,
-			NamespaceSelectors: []string{"label-1", "label-2"},
+			Type:              egv1a1.KubernetesWatchModeTypeNamespaceSelector,
+			NamespaceSelector: &metav1.LabelSelector{MatchLabels: map[string]string{"label-1": "true", "label-2": "true"}},
 		},
 	}
 
